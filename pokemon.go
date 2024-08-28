@@ -23,6 +23,8 @@ type LocationResult struct {
 	URL  string `json:"url"`
 }
 
+
+
 func HandleMapCommand(location *PokemonLocation, cache *Cache) {
 	var URL string
 	var data []byte
@@ -36,7 +38,7 @@ func HandleMapCommand(location *PokemonLocation, cache *Cache) {
 	cachedData, objectExist := cache.Get(URL)
 	if !objectExist {
 		fmt.Printf("URL: %s has never been cached before\n", URL)
-		data := FetchLocationData(URL)
+		data = FetchLocationData(URL)
 		if data != nil {
 			cache.Add(URL, data)
 			fmt.Printf("URL: %s has been cached\n", URL)
@@ -74,6 +76,7 @@ func FetchLocationData(URL string) []byte {
 	defer resp.Body.Close()
 
 	data, err := io.ReadAll(resp.Body)
+	// fmt.Printf("data: %s\n", data)
 	if err != nil {
 		fmt.Println("Error reading response body:", err)
 		return nil
@@ -94,7 +97,7 @@ func HandleMapbCommand(location *PokemonLocation, cache *Cache) {
 	cachedData, objectExist := cache.Get(URL)
 	if !objectExist {
 		fmt.Printf("URL: %s has never been cached before\n", URL)
-		data := FetchLocationData(URL)
+		data = FetchLocationData(URL)
 		if data != nil {
 			cache.Add(URL, data)
 			fmt.Printf("URL: %s has been cached\n", URL)
