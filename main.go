@@ -54,6 +54,13 @@ func main() {
 			} else {
 				HandleExploreCommand(args[0], Cache)
 			}
+		case "catch":
+			if len(args) < 1 {
+				fmt.Println("Usage: catch <pokemon>")
+			} else {
+				HandleCatchCommand(args[0], Cache)
+			}
+
 		default:
 			fmt.Println("Unknown command:", command)
 			fmt.Println(helpMessage)

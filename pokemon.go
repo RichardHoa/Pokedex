@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/tidwall/gjson"
 
 )
 
@@ -127,5 +128,25 @@ func HandleExploreCommand(city string, cache *Cache) {
 	for _, name := range pokemonList {
 		fmt.Printf("- %s\n", name)
 	}
+}
+
+func HandleCatchCommand(pokemonName string, cache *Cache) {
+	url := "https://pokeapi.co/api/v2/pokemon/" + pokemonName
+
+	pokemonData, err := FetchPokemonData(url, cache)
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+	// fmt.Printf("Pokemon: %s\n", pokemonData)
+
+	// Extract area URL from the body
+	baseExperience := gjson.GetBytes(pokemonData, "base_experience")
+	if !baseExperience.Exists() {
+		fmt.Println("Error: Base experience not found")
+	}
+	fmt.Printf("Base experience: %d\n", baseExperience.Int())
+
+
+
 }
 
