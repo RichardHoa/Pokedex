@@ -14,7 +14,7 @@ func main() {
 	Using help you can get help
 	Using exit you can exit
 	Using map to get 20 pokemon location
-	Using bmap to get previous 20 pokemon location
+	Using mapb to get previous 20 pokemon location
 	`
 
 	var result PokemonLocation
@@ -48,12 +48,14 @@ func main() {
 			for _, value := range result.Results {
 				fmt.Println(value.Name)
 			}
+			// fmt.Printf("Result previous: %s\n", result.Previous)
 
-		case "bmap":
-			if result.Page == 0 {
+		case "mapb":
+			if result.Page == 1 {
 				fmt.Println("No previous page")
 				continue
 			}	
+			// fmt.Printf("Result previous: %s\n", result.Previous)
 			URL := result.Previous
 
 			FetchLocation(URL, &result)
