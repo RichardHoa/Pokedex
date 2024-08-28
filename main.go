@@ -18,7 +18,7 @@ func main() {
 	Using explore <city> to explore a specific city
 	`
 	// Creating the cache to store the pokemon location for 10 seconds
-	PokemonLocationCache := NewCache(60)
+	Cache := NewCache(60)
 
 	var location PokemonLocation
 
@@ -45,14 +45,14 @@ func main() {
 			fmt.Println("Exiting...")
 			return
 		case "map":
-			HandleMapCommand(&location, PokemonLocationCache)
+			HandleMapCommand(&location, Cache)
 		case "mapb":
-			HandleMapbCommand(&location, PokemonLocationCache)
+			HandleMapbCommand(&location, Cache)
 		case "explore":
 			if len(args) < 1 {
 				fmt.Println("Usage: explore <city>")
 			} else {
-				HandleExploreCommand(args[0])
+				HandleExploreCommand(args[0], Cache)
 			}
 		default:
 			fmt.Println("Unknown command:", command)
