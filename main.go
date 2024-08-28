@@ -16,84 +16,96 @@ func main() {
 	Using map to get 20 pokemon location
 	Using mapb to get previous 20 pokemon location
 	`
+	// Creating the cache to store the pokemon location for 10 seconds
 	PokemonLocationCache := NewCache(10)
 
-	var result PokemonLocation
+	var location PokemonLocation
 
+	// Start an infinite loop to read user input
 	for {
+		// Prompt to read user input
 		fmt.Print("Pokedex > ")
 		input, err := reader.ReadString('\n')
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
+		// Trim white space 
 		input = strings.TrimSpace(input)
+
 		switch input {
+		// If user seek help, display help message
 		case "help":
 			fmt.Println(helpMessage)
+		// Exit the program
 		case "exit":
 			fmt.Println("Exiting...")
 			return
+		// Get 20 pokemon locations with cahe
 		case "map":
-
 			var URL string
-			// fmt.Println("Before deferred increment, Page:", result.Page)
-			// fmt.Printf("Len of the result: %d\n", len(result.Results))
-			if len(result.Results) == 0 {
-				// First time fetching the url
+
+			// For fetching in the first time, use the default url
+			// The second times use the next url in the respond
+			if len(location.Results) == 0 {
 				URL = "https://pokeapi.co/api/v2/location/"
 			} else {
-				URL = result.Next
+				URL = location.Next
 			}
-			// fmt.Printf("We are handling: %s\n", URL)
-			objectExist := PokemonLocationCache.Get(URL, &result)
+			// Check if the url has been cached
+			objectExist := PokemonLocationCache.Get(URL, &location)
+			// If it's not cached, fetch it and cache it
 			if !objectExist{
 				fmt.Printf("Url: %s has never been cached before\n", URL)
-				FetchLocation(URL, &result)
-				PokemonLocationCache.Add(URL, result)
+				FetchLocation(URL, &location)
+				PokemonLocationCache.Add(URL, location)
 				fmt.Printf("Url: %s has been cached\n", URL)
+			// If it has been cached, do nothing because the location has been updated
 			} else {
 				fmt.Printf("URL: %s has been cached\n", URL)
 			}
 			
-			for _, value := range result.Results {
+			// Print the value of each location
+			for _, value := range location.Results {
 				fmt.Println(value.Name)
 			}
-			result.Page++
-			// fmt.Println("After deferred increment, Page:", result.Page)
-			
-			// fmt.Printf("Result previous: %s\n", result.Previous)
+			// Increment the page number 
+			location.Page++
 
+		// Goes back to the previous 20 pokemon locations
 		case "mapb":
-
-			// fmt.Println("Before deferred increment, Page:", result.Page)
-			
-			currentPage := result.Page
-			if result.Page == 1 || result.Page == 0 {
+			// Current page to keep track of the current page 
+			currentPage := location.Page
+			// If the page is 1 or 0, there is no previous page
+			if location.Page == 1 || location.Page == 0 {
 				fmt.Println("No previous page")
 				continue
 			}	
-			URL := result.Previous
 
-			objectExist := PokemonLocationCache.Get(URL, &result)
+			// Get the previous url
+			URL := location.Previous
+			// Check if the url respond has been check
+			objectExist := PokemonLocationCache.Get(URL, &location)
+			// If it's not cached, fetch it and cache it
 			if !objectExist{
 				fmt.Printf("Url: %s has never been cached before\n", URL)
-				FetchLocation(URL, &result)
-				PokemonLocationCache.Add(URL, result)
+				FetchLocation(URL, &location)
+				PokemonLocationCache.Add(URL, location)
 				fmt.Printf("Url: %s has been cached\n", URL)
-
+			// If it has been cached, set the location.Page to the current page
+			// If do not set the location get messed up
 			} else {
 				fmt.Printf("URL: %s has been cached\n", URL)
-				result.Page = currentPage
+				location.Page = currentPage
 			}
-
-
-			for _, value := range result.Results {
+			// Print the value of each location
+			for _, value := range location.Results {
 				fmt.Println(value.Name)
 			}
-			result.Page--
-			// fmt.Println("After deferred increment, Page:", result.Page)
+			// Decrease the location page
+			location.Page--
 
+		// If user input is unknown, display help message
 		default:
 			fmt.Println("Unknown command:", input)
 			fmt.Println(helpMessage)
