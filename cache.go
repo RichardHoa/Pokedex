@@ -17,7 +17,7 @@ type Cache struct {
 // CacheEntry struct holds individual cache objects and their creation time
 type CacheEntry struct {
 	createdAt time.Time
-	object    PokemonLocation
+	object    []byte
 }
 
 func NewCache(interval time.Duration) *Cache {
@@ -34,7 +34,7 @@ func NewCache(interval time.Duration) *Cache {
 }
 
 // Add inserts a new object into the cache with the current timestamp
-func (c *Cache) Add(key string, object PokemonLocation) {
+func (c *Cache) Add(key string, object []byte) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.Cache[key] = CacheEntry{
@@ -44,16 +44,15 @@ func (c *Cache) Add(key string, object PokemonLocation) {
 }
 
 // Get retrieves an object from the cache
-func (c *Cache) Get(key string, object *PokemonLocation) ( bool) {
+func (c *Cache) Get(key string) ([]byte, bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	entry, ok := c.Cache[key]
 	if !ok {
-		return false
+		return nil, false
 	}
-	*object = entry.object
-	return true
+	return entry.object, true
 }
 
 // reapLoop runs periodically to remove outdated entries
