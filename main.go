@@ -16,6 +16,8 @@ func main() {
 	Using map to get 20 pokemon location
 	Using mapb to get previous 20 pokemon location
 	Using explore <city> to explore a specific city
+	Using catch <pokemon name> to catch a pokemon
+	Using inspect <pokemon name> to inspect stats of a pokemon
 	`
 	// Creating the cache to store the pokemon location for 10 seconds
 	Cache := NewCache(60)
@@ -63,6 +65,12 @@ func main() {
 				fmt.Println("Usage: catch <pokemon>")
 			} else {
 				HandleCatchCommand(args[0], Cache, &user)
+			}
+		case "inspect":
+			if len(args) < 1 {
+				fmt.Println("Usage: inspect <pokemon>")
+			} else {
+				handleInspectCommand(args[0], &user)
 			}
 
 		default:

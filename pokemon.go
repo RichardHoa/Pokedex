@@ -129,9 +129,9 @@ func HandleExploreCommand(city string, cache *Cache) {
 
 func HandleCatchCommand(pokemonName string, cache *Cache, user *User) {
 	url := "https://pokeapi.co/api/v2/pokemon/" + pokemonName
-	var pokemonData []byte 
+	var pokemonData []byte
 
-	_ , pokemonCatched := user.GetPokemon(pokemonName)
+	_, pokemonCatched := user.GetPokemon(pokemonName)
 	if pokemonCatched {
 		fmt.Println("Pokemon already catched, please choose a different pokemon")
 		return
@@ -160,15 +160,12 @@ func HandleCatchCommand(pokemonName string, cache *Cache, user *User) {
 	ceilingRandomNumber := int(float64(baseExperientInt) / randomFloat)
 	randomNumber := random.Intn(ceilingRandomNumber)
 
-	fmt.Printf("You have %f chance of catching a pokemon\n", randomFloat)
-	// fmt.Printf("With the ceiling random number: %d\n", ceilingRandomNumber)
-	// fmt.Printf("You got a random number: %d\n", randomNumber)
-	// fmt.Printf("Base experience: %d\n", baseExperientInt)
+	fmt.Printf("You have %f chance of catching a pokemon\n", randomFloat*100)
 	if randomNumber < int(baseExperientInt) {
 		fmt.Println("You caught a pokemon!")
 		user.AddPokemon(pokemonName, pokemonData)
 	} else {
-		fmt.Println("You failed to catch the pokemon.")
+		fmt.Println("Opps, Try again!")
 	}
 
 	fmt.Println("----------------------")
@@ -178,5 +175,50 @@ func HandleCatchCommand(pokemonName string, cache *Cache, user *User) {
 	}
 
 	// catch golduck
+
+}
+
+func handleInspectCommand(pokemonName string,  user *User) {
+
+	pokemonData, pokemonCatched := user.GetPokemon(pokemonName)
+	if !pokemonCatched {
+		fmt.Println("You can't view stats of a pokemon you haven't catched yet")
+		return
+	}
+	if pokemonData == nil {
+		fmt.Println("Error: No data available, please catch the pokemon again")
+		return
+	}
+
+	// Parse height and weight
+	height := gjson.GetBytes(pokemonData, "height").Int()
+	weight := gjson.GetBytes(pokemonData, "weight").Int()
+
+	// Extract specific stats using gjson
+	hp := gjson.GetBytes(pokemonData, `stats.#(stat.name=="hp").base_stat`).Int()
+	attack := gjson.GetBytes(pokemonData, `stats.#(stat.name=="attack").base_stat`).Int()
+	defense := gjson.GetBytes(pokemonData, `stats.#(stat.name=="defense").base_stat`).Int()
+	specialAttack := gjson.GetBytes(pokemonData, `stats.#(stat.name=="special-attack").base_stat`).Int()
+	specialDefense := gjson.GetBytes(pokemonData, `stats.#(stat.name=="special-defense").base_stat`).Int()
+	speed := gjson.GetBytes(pokemonData, `stats.#(stat.name=="speed").base_stat`).Int()
+	// Extract all types
+	types := gjson.GetBytes(pokemonData, "types.#.type.name").Array()
+
+	fmt.Printf("Name: %s\n", pokemonName)
+	fmt.Printf("Height: %d\n", height)
+	fmt.Printf("Weight: %d\n", weight)
+
+	fmt.Println("Stats: ")
+	fmt.Printf("  - HP: %d\n", hp)
+	fmt.Printf("  - Attack: %d\n", attack)
+	fmt.Printf("  - Defense: %d\n", defense)
+	fmt.Printf("  - Special Attack: %d\n", specialAttack)
+	fmt.Printf("  - Special Defense: %d\n", specialDefense)
+	fmt.Printf("  - Speed: %d\n", speed)
+
+	fmt.Println("Types: ")
+	for _, t := range types {
+		fmt.Printf("  - Type: %s\n", t)
+	}
 
 }
