@@ -72,6 +72,8 @@ func main() {
 			} else {
 				handleInspectCommand(args[0], &user)
 			}
+		case "pokedex":
+			HandlePokedexCommand(&user)
 
 		default:
 			fmt.Println("Unknown command:", command)

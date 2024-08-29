@@ -168,14 +168,6 @@ func HandleCatchCommand(pokemonName string, cache *Cache, user *User) {
 		fmt.Println("Opps, Try again!")
 	}
 
-	fmt.Println("----------------------")
-	fmt.Println("Your pokemons list: ")
-	for k := range user.PokemonMap {
-		fmt.Printf("Pokemon - %s\n", k)
-	}
-
-	// catch golduck
-
 }
 
 func handleInspectCommand(pokemonName string,  user *User) {
@@ -221,4 +213,13 @@ func handleInspectCommand(pokemonName string,  user *User) {
 		fmt.Printf("  - Type: %s\n", t)
 	}
 
+}
+
+
+func HandlePokedexCommand( user *User) {
+	fmt.Println("----------------------")
+	fmt.Println("Your pokemons list: ")
+	for k := range user.PokemonMap {
+		fmt.Printf("- %s\n", k)
+	}
 }
