@@ -71,7 +71,7 @@ func FetchAndExtractAreaURL(url string, cache *Cache) (areaURL string, err error
 	// Extract area URL from the body
 	result := gjson.GetBytes(body, "areas.0.url")
 	if !result.Exists() {
-		return "", fmt.Errorf("area URL not found in JSON")
+		return "", fmt.Errorf("This location does not have any pokemon")
 	}
 
 	return result.String(), nil
@@ -133,7 +133,7 @@ func FetchPokemonData(url string, cache *Cache) ([]byte, error) {
 		defer resp.Body.Close()
 
 		if resp.StatusCode != http.StatusOK {
-			return []byte{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+			return []byte{}, fmt.Errorf("please check the pokemon name again")
 		}
 
 		pokemonData, err = io.ReadAll(resp.Body)

@@ -22,6 +22,10 @@ func main() {
 
 	var location PokemonLocation
 
+	user := User{
+		PokemonMap: make(map[string]Pokemon), // Properly initialize the map
+	}
+
 	// Start an infinite loop to read user input
 	for {
 		// Prompt to read user input
@@ -58,7 +62,7 @@ func main() {
 			if len(args) < 1 {
 				fmt.Println("Usage: catch <pokemon>")
 			} else {
-				HandleCatchCommand(args[0], Cache)
+				HandleCatchCommand(args[0], Cache, &user)
 			}
 
 		default:

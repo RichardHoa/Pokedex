@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/tidwall/gjson"
-
+	"math/rand"
+	"time"
 )
 
 type PokemonLocation struct {
@@ -19,8 +20,6 @@ type LocationResult struct {
 	Name string `json:"name"`
 	URL  string `json:"url"`
 }
-
-
 
 func HandleMapCommand(location *PokemonLocation, cache *Cache) {
 	var URL string
@@ -106,8 +105,6 @@ func HandleMapbCommand(location *PokemonLocation, cache *Cache) {
 	location.Page--
 }
 
-
-
 // HandleExploreCommand handles the "explore" command with a city argument
 func HandleExploreCommand(city string, cache *Cache) {
 	URL := "https://pokeapi.co/api/v2/location/" + city
@@ -130,23 +127,56 @@ func HandleExploreCommand(city string, cache *Cache) {
 	}
 }
 
-func HandleCatchCommand(pokemonName string, cache *Cache) {
+func HandleCatchCommand(pokemonName string, cache *Cache, user *User) {
 	url := "https://pokeapi.co/api/v2/pokemon/" + pokemonName
+	var pokemonData []byte 
+
+	_ , pokemonCatched := user.GetPokemon(pokemonName)
+	if pokemonCatched {
+		fmt.Println("Pokemon already catched, please choose a different pokemon")
+		return
+	}
 
 	pokemonData, err := FetchPokemonData(url, cache)
 	if err != nil {
 		fmt.Println("Error:", err)
+		return
 	}
-	// fmt.Printf("Pokemon: %s\n", pokemonData)
 
 	// Extract area URL from the body
 	baseExperience := gjson.GetBytes(pokemonData, "base_experience")
+	baseExperientInt := baseExperience.Int()
 	if !baseExperience.Exists() {
 		fmt.Println("Error: Base experience not found")
+		return
 	}
-	fmt.Printf("Base experience: %d\n", baseExperience.Int())
 
+	src := rand.NewSource(time.Now().UnixNano())
+	random := rand.New(src)
 
+	// If a pokemon has the experience below 20, it will be caught
+	// randomFloat := (1 / (float64(baseExperientInt))) * 20
+	randomFloat := 1.00
+	ceilingRandomNumber := int(float64(baseExperientInt) / randomFloat)
+	randomNumber := random.Intn(ceilingRandomNumber)
+
+	fmt.Printf("You have %f chance of catching a pokemon\n", randomFloat)
+	// fmt.Printf("With the ceiling random number: %d\n", ceilingRandomNumber)
+	// fmt.Printf("You got a random number: %d\n", randomNumber)
+	// fmt.Printf("Base experience: %d\n", baseExperientInt)
+	if randomNumber < int(baseExperientInt) {
+		fmt.Println("You caught a pokemon!")
+		user.AddPokemon(pokemonName, pokemonData)
+	} else {
+		fmt.Println("You failed to catch the pokemon.")
+	}
+
+	fmt.Println("----------------------")
+	fmt.Println("Your pokemons list: ")
+	for k := range user.PokemonMap {
+		fmt.Printf("Pokemon - %s\n", k)
+	}
+
+	// catch golduck
 
 }
-
